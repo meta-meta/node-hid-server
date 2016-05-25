@@ -48,6 +48,26 @@ udpPort.on("ready", function () {
 
 udpPort.open();
 
+
+var SpaceNavigator = require('node-spacenav');
+console.log('found ', SpaceNavigator.deviceCount(), ' spacenavs');
+var spacenav = new SpaceNavigator.SpaceNavigator();
+
+var socket;
+
+spacenav.on('translate', function (translation) {
+    socket && socket.send(JSON.stringify({spaceNav: {
+        translate: translation
+    }}));
+} );
+
+spacenav.on('rotate', function (rotation) {
+    socket && socket.send(JSON.stringify({spaceNav: {
+        rotate: rotation
+    }}));
+} );
+
+
 // Create an Express-based Web Socket server to which OSC messages will be relayed.
 var app = express(),
     server = app.listen(WS_PORT),
@@ -55,14 +75,15 @@ var app = express(),
         server: server
     });
 
-wss.on("connection", function (socket) {
+wss.on('connection', function (ws) {
+
     console.log("A Web Socket connection has been established!");
+
+    socket = ws;
 
     // var socketPort = new osc.WebSocketPort({
     //     socket: socket
     // });
-
-    
 
     // oscPorts.push(socketPort);
     //
@@ -74,6 +95,13 @@ wss.on("connection", function (socket) {
     //
     // console.log('new relay');
 });
+
+wss.on('close', function (ws) {
+    console.log('closed', sockets.length);
+    sockets.splice(sockets.indexOf(ws), 1);
+    console.log(sockets.length);
+});
+
 
 // var com = require("serialport");
 // var serialPort = new com.SerialPort(COM_PORT, {
