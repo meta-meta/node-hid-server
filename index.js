@@ -68,6 +68,13 @@ spacenav.on('rotate', function (rotation) {
 } );
 
 
+var wintab = require('node-wintab');
+setInterval(function () {
+    socket && socket.send(JSON.stringify({wintab: wintab.allData()}));
+    // console.log(wintab.allData());
+}, 34);
+
+
 // Create an Express-based Web Socket server to which OSC messages will be relayed.
 var app = express(),
     server = app.listen(WS_PORT),
