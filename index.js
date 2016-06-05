@@ -70,8 +70,7 @@ spacenav.on('rotate', function (rotation) {
 
 var wintab = require('node-wintab');
 setInterval(function () {
-    socket && socket.send(JSON.stringify({wintab: wintab.allData()}));
-    // console.log(wintab.allData());
+    socket && socket.readyState === 1 && socket.send(JSON.stringify({wintab: wintab.allData()}));
 }, 34);
 
 
